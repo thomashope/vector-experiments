@@ -31,8 +31,10 @@ TEST_CASE( "Vector swizzles" )
 
 	b = a.xz; // assign swizzle to vec2
 
-	CHECK((vec2)a.xz == b); // FIXME: requires cast when on LHS
+	CHECK((vec2)a.xz == b);
+	CHECK(a.xz == b);
 	CHECK(b == a.xz);
+	CHECK(b == (vec2)a.xz);
 
 	const vec2 c(4, 5);
 	a = vec3(1, 2, 3);
@@ -68,4 +70,7 @@ TEST_CASE( "Vector swizzles" )
 	a.z = 1;
 	a.xy += a.zz;
 	CHECK(a == vec3(3,2,1));
+
+	// CHECK(a.xy + a.yx == vec2(4,4));
+	// CHECK(vec2(4,4) == a.xx + a.yy);
 }

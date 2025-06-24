@@ -17,20 +17,39 @@ struct vec2
 	vec2 operator + (const vec2& rhs) const { return vec2(x + rhs.x, y + rhs.y); }
 };
 
-#define swizzle_v2_ops\
-	vec2 operator + (const vec2& rhs) const { return vec2(*this) + rhs; } \
+#define swizzle_v2_inline_ops(a, b)\
+	bool operator == (const vec2& rhs) const { return a == rhs.x && b == rhs.y; }\
+	vec2 operator + (const vec2& rhs) const { return vec2(*this) + rhs; }
 
 // NB: returning void here breaks chaining, but IDK if I ever use that?
-#define swizzle_v2_assign_ops(a, b)\
+#define swizzle_v2_inline_assign_ops(a, b)\
+	void operator = (const vec2& rhs) { a = rhs.x; b = rhs.y; }\
 	void operator += (const vec2& rhs) { a += rhs.x; b += rhs.y; }
 
+// This is the inline version. Use it directly inside the union.
+//
+// NB: this only allows one way operator overloads
 #define swizzle_v3_v2(a, b) \
 	struct { f32 x, y, z; \
 	operator vec2 () const { return vec2(a, b); } \
 	void operator = (const vec2& rhs) { a = rhs.x; b = rhs.y; } \
-	swizzle_v2_assign_ops(a, b) \
-	swizzle_v2_ops \
+	swizzle_v2_inline_assign_ops(a,b) \
+	swizzle_v2_inline_ops \
 	} a##b;
+
+// This macro is for declaring the type outside of the struct. You have to add it to the union separately.
+//
+// Unlike the inine version above, this lets you define operator overlaods in both directions.	
+#define swizzle_v3_v2_t(a, b) \
+	struct vec3_##a##b##_t { f32 x, y, z; \
+	operator vec2 () const { return vec2(a, b); } \
+	swizzle_v2_inline_assign_ops(a,b) \
+	swizzle_v2_inline_ops(a,b) \
+	}; \
+	bool operator == (const vec2& lhs, const vec3_##a##b##_t& rhs) { return lhs == (vec2)rhs; }
+	// vec2 operator + (const vec2& lhs, const vec3_##a##b##_t& rhs) { return lhs + (vec2)rhs; }
+
+#define swizzle_v3_v2_member(a,b) vec3_##a##b##_t a##b;
 
 // NB: splats are not assignable, but AFAIK that doesn't make sense anyway?
 #define splat_v3_v2(a, b) \
@@ -43,6 +62,8 @@ struct vec2
 	operator vec3 () { return vec3(a, b, c); } \
 	} a##b##c;
 
+#include "vec3_swizzle_types.inl"
+
 struct vec3
 {
 	vec3(f32 x, f32 y, f32 z) : x(x), y(y), z(z) {}
@@ -50,9 +71,8 @@ struct vec3
 	union
 	{
 		struct { f32 x, y, z; };
-		swizzle_v3_v2(x, y)
-		swizzle_v3_v2(y, z)
-		swizzle_v3_v2(x, z)
+		#include "vec3_swizzles.inl"
+
 		splat_v3_v2(x, x)
 		splat_v3_v2(y, y)
 		splat_v3_v2(z, z)
