@@ -1,1 +1,1 @@
-clang++ -std=c++11 test.cpp -Wall -fsanitize=undefined
+clang++ -std=c++11 test.cpp -Wall -Wextra -fsanitize=undefined

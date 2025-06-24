@@ -8,7 +8,6 @@ typedef float f32;
 struct vec2
 {
 	vec2() = default;
-	vec2(const vec2&) = default;
 	vec2(f32 x, f32 y) : x(x), y(y) {}
 	union
 	{
@@ -55,7 +54,6 @@ struct vec2
 struct vec3
 {
 	vec3() = default;
-	vec3(const vec3&) = default;
 	vec3(f32 x, f32 y, f32 z) : x(x), y(y), z(z) {}
 
 	union
