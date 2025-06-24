@@ -1,1 +1,1 @@
-clang -std=c++11 main.cpp -o a.out -Wall -fsanitize=undefined
+clang++ -std=c++11 main.cpp -Wall -fsanitize=undefined
