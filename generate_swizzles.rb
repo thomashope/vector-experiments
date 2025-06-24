@@ -1,19 +1,33 @@
-#!ruby
 components = %w[x y z]
 
-# Generate all 2-letter combinations, excluding duplicates like xx, yy, zz
-pairs = components.product(components).reject { |a, b| a == b }
+# Generate all 2-component combinations
+pairs = components.product(components)
+triples = components.product(components, components)
 
-# Write to types file
 File.open("vec3_swizzle_types.inl", "w") do |types_file|
   pairs.each do |a, b|
-    types_file.puts "swizzle_v3_v2_type(#{a},#{b})"
+    if a != b
+      types_file.puts "swizzle_v3_v2_type(#{a},#{b})"
+    end
   end
 end
 
-# Write to members file
-File.open("vec3_swizzles.inl", "w") do |swizzles_file|
+File.open("vec3_swizzles.inl", "w") do |members_file|
   pairs.each do |a, b|
-    swizzles_file.puts "swizzle_v3_v2_member(#{a},#{b})"
+    if a != b
+      members_file.puts "swizzle_v3_v2_member(#{a},#{b})"
+    end
+  end
+
+  pairs.each do |a, b|
+    if a == b
+      members_file.puts "splat_v3_v2(#{a}, #{b})"
+    end
+  end
+
+  triples.each do |a, b, c|
+    if a == b || a == c || b == c
+      members_file.puts "splat_v3_v3(#{a}, #{b}, #{c})"
+    end
   end
 end

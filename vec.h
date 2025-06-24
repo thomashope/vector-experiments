@@ -67,11 +67,6 @@ struct vec3
 	{
 		struct { f32 x, y, z; };
 		#include "vec3_swizzles.inl"
-
-		splat_v3_v2(x, x)
-		splat_v3_v2(y, y)
-		splat_v3_v2(z, z)
-		splat_v3_v3(x, x, y)
 	};
 
 	bool operator == (const vec3& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
