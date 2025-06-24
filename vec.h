@@ -28,15 +28,12 @@ struct vec2
 	void operator = (const vec2& rhs) { a = rhs.x; b = rhs.y; }\
 	void operator += (const vec2& rhs) { a += rhs.x; b += rhs.y; }
 
-// This macro is for declaring the type outside of the struct. You have to add it to the union separately.
-#define swizzle_v3_v2_type(a, b) \
-	struct vec3_##a##b##_t { f32 x, y, z; \
+#define swizzle_v3_v2(a, b) \
+	struct { f32 x, y, z; \
 	operator vec2 () const { return vec2(a, b); } \
 	swizzle_v2_inline_assign_ops(a,b) \
 	swizzle_inline_ops(2) \
-	};
-
-#define swizzle_v3_v2_member(a,b) vec3_##a##b##_t a##b;
+	} a##b;
 
 #define splat_inline_ops(num)\
 	bool operator == (const vec##num& rhs) const { return vec##num(*this) == rhs; }\
@@ -54,8 +51,6 @@ struct vec2
 	operator vec3 () const { return vec3(a, b, c); } \
 	splat_inline_ops(3)\
 	} a##b##c;
-
-#include "vec3_swizzle_types.inl"
 
 struct vec3
 {

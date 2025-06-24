@@ -4,18 +4,10 @@ components = %w[x y z]
 pairs = components.product(components)
 triples = components.product(components, components)
 
-File.open("vec3_swizzle_types.inl", "w") do |types_file|
-  pairs.each do |a, b|
-    if a != b
-      types_file.puts "swizzle_v3_v2_type(#{a},#{b})"
-    end
-  end
-end
-
 File.open("vec3_swizzles.inl", "w") do |members_file|
   pairs.each do |a, b|
     if a != b
-      members_file.puts "swizzle_v3_v2_member(#{a},#{b})"
+      members_file.puts "swizzle_v3_v2(#{a},#{b})"
     end
   end
 
