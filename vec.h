@@ -78,6 +78,11 @@ struct vec3
 	vec3 operator + (const vec3& rhs) const { return vec3(x + rhs.x, y + rhs.y, z + rhs.z); }
 };
 
+f32 dot(const vec2& a, const vec2& b)
+{
+    return a.x * b.x + a.y * b.y;
+}
+
 static_assert(sizeof(f32) == 4, "f32 must be 4 bytes");
 static_assert(sizeof(vec2) == 2 * sizeof(f32), "vec2 must by 2 f32");
 static_assert(sizeof(vec3) == 3 * sizeof(f32), "vec3 must by 3 f32");

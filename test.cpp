@@ -31,7 +31,7 @@ TEST_CASE("Basic vector ops")
 
 	vec2 c(1, 2);
 	vec2 d(4, 4);
-	
+
 	CHECK(c == c);
 	CHECK(c == vec2(1, 2));
 	CHECK(vec2(1, 2) == c);
@@ -143,4 +143,17 @@ TEST_CASE("non-assignment operators on splats")
 	CHECK(sum == a.xx + yy);
 	CHECK(sum == xx + a.yy);
 	CHECK(sum == a.xx + a.yy);
+}
+
+TEST_CASE("free functions")
+{
+	vec3 a(1,2,3);
+	vec2 xx(a.xx);
+	vec2 xy(a.xy);
+	vec2 yz(a.yz);
+
+	CHECK(dot(xy, xy) == 5.0f	);
+	CHECK(dot(a.xy, a.xy) == 5.0f);
+	CHECK(dot(a.xy, a.yz) == dot(xy, yz));
+	CHECK(dot(a.xx, a.xx) == dot(xx, xx));
 }
