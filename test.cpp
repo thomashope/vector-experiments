@@ -70,7 +70,22 @@ TEST_CASE( "Vector swizzles" )
 	a.z = 1;
 	a.xy += a.zz;
 	CHECK(a == vec3(3,2,1));
+}
 
-	// CHECK(a.xy + a.yx == vec2(4,4));
-	// CHECK(vec2(4,4) == a.xx + a.yy);
+TEST_CASE("non-assignment operatos on swizzles")
+{
+	vec3 a = vec3(3,2,1);
+	print(a);
+
+	CHECK(a.xy + (vec2)a.yx == vec2(5,5));
+	CHECK((vec2)a.xy + a.yx == vec2(5,5));
+	CHECK(a.xy + a.yx == vec2(5,5));
+	CHECK(vec2(5,5) == a.xy + (vec2)a.yx);
+	CHECK(vec2(5,5) == (vec2)a.xy + a.yx);
+	CHECK(vec2(5,5) == a.xy + a.yx);
+}
+
+TEST_CASE("non-assignment operators on splats")
+{
+
 }

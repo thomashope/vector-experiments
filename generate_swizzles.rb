@@ -7,7 +7,7 @@ pairs = components.product(components).reject { |a, b| a == b }
 # Write to types file
 File.open("vec3_swizzle_types.inl", "w") do |types_file|
   pairs.each do |a, b|
-    types_file.puts "swizzle_v3_v2_t(#{a},#{b})"
+    types_file.puts "swizzle_v3_v2_type(#{a},#{b})"
   end
 end
 

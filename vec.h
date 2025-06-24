@@ -26,21 +26,10 @@ struct vec2
 	void operator = (const vec2& rhs) { a = rhs.x; b = rhs.y; }\
 	void operator += (const vec2& rhs) { a += rhs.x; b += rhs.y; }
 
-// This is the inline version. Use it directly inside the union.
-//
-// NB: this only allows one way operator overloads
-#define swizzle_v3_v2(a, b) \
-	struct { f32 x, y, z; \
-	operator vec2 () const { return vec2(a, b); } \
-	void operator = (const vec2& rhs) { a = rhs.x; b = rhs.y; } \
-	swizzle_v2_inline_assign_ops(a,b) \
-	swizzle_v2_inline_ops \
-	} a##b;
-
 // This macro is for declaring the type outside of the struct. You have to add it to the union separately.
 //
 // Unlike the inine version above, this lets you define operator overlaods in both directions.	
-#define swizzle_v3_v2_t(a, b) \
+#define swizzle_v3_v2_type(a, b) \
 	struct vec3_##a##b##_t { f32 x, y, z; \
 	operator vec2 () const { return vec2(a, b); } \
 	swizzle_v2_inline_assign_ops(a,b) \
