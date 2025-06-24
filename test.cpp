@@ -17,24 +17,34 @@ void modify_ref(vec2& v)
 	v.y = 42;
 }
 
+TEST_CASE("Basic vector ops")
+{
+	vec3 a(1, 2, 3);
+	vec3 b(4, 4, 4);
+
+	CHECK(a == a);
+	CHECK(a == vec3(1, 2, 3));
+	CHECK(b == b);
+	CHECK(b == vec3(4, 4, 4));
+	CHECK(a + a == vec3(2, 4, 6));
+	CHECK(a + b == vec3(5, 6, 7));
+
+	vec2 c(1, 2);
+	vec2 d(4, 4);
+	
+	CHECK(c == c);
+	CHECK(c == vec2(1, 2));
+	CHECK(vec2(1, 2) == c);
+	CHECK(c + d == vec2(5, 6));
+	CHECK(vec2(5, 6) == c + d);
+}
+
 TEST_CASE( "Vector swizzles" )
 {
 	vec3 a(1, 2, 3);
 	vec2 b(0, 0);
 	print(a);
 	print(b);
-
-	CHECK(a == a);
-	CHECK(a == vec3(1, 2, 3));
-	CHECK(b == b);
-	CHECK(b == vec2(0, 0));
-
-	b = a.xz; // assign swizzle to vec2
-
-	CHECK((vec2)a.xz == b);
-	CHECK(a.xz == b);
-	CHECK(b == a.xz);
-	CHECK(b == (vec2)a.xz);
 
 	const vec2 c(4, 5);
 	a = vec3(1, 2, 3);
@@ -75,17 +85,62 @@ TEST_CASE( "Vector swizzles" )
 TEST_CASE("non-assignment operatos on swizzles")
 {
 	vec3 a = vec3(3,2,1);
-	print(a);
+	vec2 xy(a.xy);
+	vec2 yx(a.yx);
+	vec2 sum(5,5);
 
-	CHECK(a.xy + (vec2)a.yx == vec2(5,5));
-	CHECK((vec2)a.xy + a.yx == vec2(5,5));
-	CHECK(a.xy + a.yx == vec2(5,5));
-	CHECK(vec2(5,5) == a.xy + (vec2)a.yx);
-	CHECK(vec2(5,5) == (vec2)a.xy + a.yx);
-	CHECK(vec2(5,5) == a.xy + a.yx);
+	CHECK(a.xy == a.xy);
+	CHECK(a.xy == xy);
+	CHECK(xy == a.xy);
+
+	CHECK(a.xy + yx == sum);
+	CHECK(xy + a.yx == sum);
+	CHECK(a.xy + a.yx == sum);
+
+	CHECK(sum == a.xy + yx);
+	CHECK(sum == xy + a.yx);
+	CHECK(sum == a.xy + a.yx);
+
+	vec2 xz(a.x, a.z);
+	vec2 xz2;
+	xz2 = a.xz;
+
+	CHECK(xz2 == xz);
+	CHECK((vec2)a.xz == xz);
+	CHECK(a.xz == xz);
+	CHECK(xz == a.xz);
+	CHECK(xz == (vec2)a.xz);
+}
+
+TEST_CASE("Assign between swizzles and vectors")
+{
+	vec3 a(1, 2, 3);
+	vec2 b(a.x, a.y);
+	vec2 c(0, 0);
+
+	c = a.xy;
+	CHECK(c == b);
+	c = vec2(1,1);
+	a.xy = c;
+	CHECK(a.xy == c);
 }
 
 TEST_CASE("non-assignment operators on splats")
 {
+	vec3 a = vec3(3,2,1);
+	vec2 xx(a.xx);
+	vec2 yy(a.yy);
+	vec2 sum(5,5);
 
+	CHECK(a.xx == a.xx);
+	CHECK(a.xx == xx);
+	CHECK(xx == a.xx);
+
+	CHECK(a.xx + yy == sum);
+	CHECK(xx + a.yy == sum);
+	CHECK(a.xx + a.yy == sum);
+
+	CHECK(sum == a.xx + yy);
+	CHECK(sum == xx + a.yy);
+	CHECK(sum == a.xx + a.yy);
 }
