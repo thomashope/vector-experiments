@@ -10,8 +10,13 @@ They can give nice ergonomics, but impelementations often they come with a not i
 
 TODO:
 - [ ] implement enough stuff in the macro version so I can do a fair comparison
+	- all ops for vec2, 3, and 4
 - [ ] bring in a comparable template based implementation to profile against
 	- compile times in debug and release
 	- binary size
 	- performance
 	- see if they work with Edit and Continue?
+
+
+inspo
+- https://madethisthing.com/iq/vectypes

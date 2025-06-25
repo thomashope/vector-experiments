@@ -8,6 +8,7 @@ void print(vec2 v) { printf("%.3f, %.3f\n", v.x, v.y); }
 
 void print_ref(const vec2& v)
 {
+	printf("Printing ref: ");
 	print(v);
 }
 
@@ -26,6 +27,7 @@ TEST_CASE("Basic vector ops")
 	CHECK(a == vec3(1, 2, 3));
 	CHECK(b == b);
 	CHECK(b == vec3(4, 4, 4));
+
 	CHECK(a + a == vec3(2, 4, 6));
 	CHECK(a + b == vec3(5, 6, 7));
 
@@ -43,8 +45,6 @@ TEST_CASE( "Vector swizzles" )
 {
 	vec3 a(1, 2, 3);
 	vec2 b(0, 0);
-	print(a);
-	print(b);
 
 	const vec2 c(4, 5);
 	a = vec3(1, 2, 3);
@@ -82,7 +82,7 @@ TEST_CASE( "Vector swizzles" )
 	CHECK(a == vec3(3,2,1));
 }
 
-TEST_CASE("non-assignment operatos on swizzles")
+TEST_CASE("non-assignment operators on swizzles")
 {
 	vec3 a = vec3(3,2,1);
 	vec2 xy(a.xy);
@@ -123,6 +123,38 @@ TEST_CASE("Assign between swizzles and vectors")
 	c = vec2(1,1);
 	a.xy = c;
 	CHECK(a.xy == c);
+}
+
+TEST_CASE("Assign between swizzles and splats")
+{
+	vec3 a(1, 2, 3);
+	vec3 b(4, 5, 6);
+
+	a.xy = a.zz;
+	CHECK(a.xy == vec2(3, 3));
+	CHECK(a.xy == a.zz);
+
+	a.zyx = b;
+	CHECK(a == vec3(6, 5, 4));
+	CHECK(a == b.zyx);
+	CHECK(a.zyx == b);
+
+	//a.zz = b.xy; // This shuold NOT compile
+}
+
+TEST_CASE("Vector Vector and Vector Scalar")
+{	
+	vec3 a(1, 2, 3);
+
+	CHECK(a + 1 == vec3(2, 3, 4));
+	CHECK(a * 2 == vec3(2, 4, 6));
+	CHECK(1 + a == vec3(2, 3, 4));
+	CHECK(2 * a == vec3(2, 4, 6));
+
+	a += 1;
+	CHECK(a == vec3(2, 3, 4));
+	a *= 2;
+	CHECK(a == vec3(4, 6, 8));
 }
 
 TEST_CASE("non-assignment operators on splats")
