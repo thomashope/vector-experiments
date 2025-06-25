@@ -34,7 +34,7 @@ typedef float f32;
 	vec##num##_inline_op(+) vec##num##_inline_op(-) vec##num##_inline_op(*) vec##num##_inline_op(/)
 
 #define vec_free_op(num, op)\
-	vec##num operator op (f32 s, const vec##num& v) { return v op s; }
+	inline vec##num operator op (f32 s, const vec##num& v) { return v op s; }
 
 #define vec_free_ops(num)\
 	vec_free_op(num, +) vec_free_op(num, -) vec_free_op(num, *) vec_free_op(num, /)
@@ -52,28 +52,79 @@ typedef float f32;
 	swizzle_inline_op(num, +) swizzle_inline_op(num, -) swizzle_inline_op(num, *) swizzle_inline_op(num, /)
 
 // NB: returning void here breaks chaining, but IDK if I ever use that?
+#define swizzle_v2_inline_assign_op(a, b, op)\
+	void operator op##= (const vec2& rhs) { a op##= rhs.x; b op##= rhs.y; }
+
 #define swizzle_v2_inline_assign_ops(a, b)\
 	void operator = (const vec2& rhs) { a = rhs.x; b = rhs.y; }\
-	void operator += (const vec2& rhs) { a += rhs.x; b += rhs.y; }
+	swizzle_v2_inline_assign_op(a, b, +)\
+	swizzle_v2_inline_assign_op(a, b, -)\
+	swizzle_v2_inline_assign_op(a, b, *)\
+	swizzle_v2_inline_assign_op(a, b, /)
 
 // NB: returning void here breaks chaining, but IDK if I ever use that?
+#define swizzle_v3_inline_assign_op(a, b, c, op)\
+	void operator op##= (const vec3& rhs) { a op##= rhs.x; b op##= rhs.y; c op##= rhs.z; }
+
 #define swizzle_v3_inline_assign_ops(a, b, c)\
 	void operator = (const vec3& rhs) { a = rhs.x; b = rhs.y; c = rhs.z; }\
-	void operator += (const vec3& rhs) { a += rhs.x; b += rhs.y; c += rhs.z; }
+	swizzle_v3_inline_assign_op(a, b, c, +)\
+	swizzle_v3_inline_assign_op(a, b, c, -)\
+	swizzle_v3_inline_assign_op(a, b, c, *)\
+	swizzle_v3_inline_assign_op(a, b, c, /)
 
-#define swizzle_v3_v2(a, b) \
-	struct { f32 x, y, z; \
-	operator vec2 () const { return vec2(a, b); } \
-	swizzle_v2_inline_assign_ops(a,b) \
-	swizzle_inline_ops(2) \
+// NB: returning void here breaks chaining, but IDK if I ever use that?
+#define swizzle_v4_inline_assign_op(a, b, c, d, op)\
+	void operator op##= (const vec4& rhs) { a op##= rhs.x; b op##= rhs.y; c op##= rhs.z; d op##= rhs.w; }
+
+#define swizzle_v4_inline_assign_ops(a, b, c, d)\
+	void operator = (const vec4& rhs) { a = rhs.x; b = rhs.y; c = rhs.z; d = rhs.w; }\
+	swizzle_v4_inline_assign_op(a, b, c, d, +)\
+	swizzle_v4_inline_assign_op(a, b, c, d, -)\
+	swizzle_v4_inline_assign_op(a, b, c, d, *)\
+	swizzle_v4_inline_assign_op(a, b, c, d, /)
+
+#define swizzle_v2_v2(a, b)\
+	struct { f32 x, y;\
+	operator vec2 () const { return vec2(a, b); }\
+	swizzle_v2_inline_assign_ops(a, b)\
+	swizzle_inline_ops(2)\
 	} a##b;
 
-#define swizzle_v3_v3(a, b, c) \
-	struct { f32 x, y, z; \
-	operator vec3 () const { return vec3(a, b, c); } \
-	swizzle_v3_inline_assign_ops(a,b,c) \
-	swizzle_inline_ops(3) \
+#define swizzle_v3_v2(a, b)\
+	struct { f32 x, y, z;\
+	operator vec2 () const { return vec2(a, b); }\
+	swizzle_v2_inline_assign_ops(a, b)\
+	swizzle_inline_ops(2)\
+	} a##b;
+
+#define swizzle_v3_v3(a, b, c)\
+	struct { f32 x, y, z;\
+	operator vec3 () const { return vec3(a, b, c); }\
+	swizzle_v3_inline_assign_ops(a, b, c)\
+	swizzle_inline_ops(3)\
 	} a##b##c;
+
+#define swizzle_v4_v2(a, b)\
+	struct { f32 x, y, z, w;\
+	operator vec2 () const { return vec2(a, b); }\
+	swizzle_v2_inline_assign_ops(a, b)\
+	swizzle_inline_ops(2)\
+	} a##b;
+
+#define swizzle_v4_v3(a, b, c)\
+	struct { f32 x, y, z, w;\
+	operator vec3 () const { return vec3(a, b, c); }\
+	swizzle_v3_inline_assign_ops(a, b, c)\
+	swizzle_inline_ops(3)\
+	} a##b##c;
+
+#define swizzle_v4_v4(a, b, c, d)\
+	struct { f32 x, y, z, w;\
+	operator vec4 () const { return vec4(a, b, c, d); }\
+	swizzle_v4_inline_assign_ops(a, b, c, d)\
+	swizzle_inline_ops(4)\
+	} a##b##c##d;
 
 //
 // vector splats
@@ -84,17 +135,41 @@ typedef float f32;
 	vec##num operator + (const vec##num& rhs) const { return vec##num(*this) + rhs; }
 
 // NB: splats are not assignable, but AFAIK that doesn't make sense anyway?
-#define splat_v3_v2(a, b) \
-	struct { f32 x, y, z; \
-	operator vec2 () const { return vec2(a, b); } \
+#define splat_v2_v2(a, b)\
+	struct { f32 x, y;\
+	operator vec2 () const { return vec2(a, b); }\
 	splat_inline_ops(2)\
 	} a##b;
 
-#define splat_v3_v3(a, b, c) \
-	struct { f32 x, y, z; \
-	operator vec3 () const { return vec3(a, b, c); } \
+#define splat_v3_v2(a, b)\
+	struct { f32 x, y, z;\
+	operator vec2 () const { return vec2(a, b); }\
+	splat_inline_ops(2)\
+	} a##b;
+
+#define splat_v3_v3(a, b, c)\
+	struct { f32 x, y, z;\
+	operator vec3 () const { return vec3(a, b, c); }\
 	splat_inline_ops(3)\
 	} a##b##c;
+
+#define splat_v4_v2(a, b)\
+	struct { f32 x, y, z, w;\
+	operator vec2 () const { return vec2(a, b); }\
+	splat_inline_ops(2)\
+	} a##b;
+
+#define splat_v4_v3(a, b, c)\
+	struct { f32 x, y, z, w;\
+	operator vec3 () const { return vec3(a, b, c); }\
+	splat_inline_ops(3)\
+	} a##b##c;
+
+#define splat_v4_v4(a, b, c, d)\
+	struct { f32 x, y, z, w;\
+	operator vec4 () const { return vec4(a, b, c, d); }\
+	splat_inline_ops(4)\
+	} a##b##c##d;
 
 //
 // vector types
@@ -107,6 +182,7 @@ struct vec2
 	union
 	{
 		struct { float x, y; };
+		#include "vec2_swizzles.inl"
 	};
 
 	bool operator == (const vec2& rhs) const { return x == rhs.x && y == rhs.y; }
@@ -137,6 +213,7 @@ struct vec4
 	union
 	{
 		struct { f32 x, y, z, w; };
+		#include "vec4_swizzles.inl"
 	};
 	bool operator == (const vec4& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
 	vec4 operator - () const { return {-x, -y, -z, -w}; }
@@ -151,6 +228,7 @@ vec_free_ops(4)
 //
 //
 
+inline
 f32 dot(const vec2& a, const vec2& b)
 {
     return a.x * b.x + a.y * b.y;

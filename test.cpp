@@ -80,6 +80,15 @@ TEST_CASE( "Vector swizzles" )
 	a.z = 1;
 	a.xy += a.zz;
 	CHECK(a == vec3(3,2,1));
+
+	vec4 d(1, 2, 3, 4);
+	
+	a = vec3(1, 2, 3);
+	CHECK(a == d.xyz);
+
+	d += 1;
+	CHECK(d == vec4(2, 3, 4, 5));
+	CHECK(d.xyz == a + 1);
 }
 
 TEST_CASE("non-assignment operators on swizzles")
@@ -110,6 +119,9 @@ TEST_CASE("non-assignment operators on swizzles")
 	CHECK(a.xz == xz);
 	CHECK(xz == a.xz);
 	CHECK(xz == (vec2)a.xz);
+
+	CHECK(1 + a.xy == xy + 1);
+	CHECK(a.xy + 1 == xy + 1);
 }
 
 TEST_CASE("Assign between swizzles and vectors")
