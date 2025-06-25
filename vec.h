@@ -178,10 +178,11 @@ typedef float f32;
 struct vec2
 {
 	vec2() = default;
+	vec2(f32 all) : x(all), y(all) {}
 	vec2(f32 x, f32 y) : x(x), y(y) {}
 	union
 	{
-		struct { float x, y; };
+		struct { f32 x, y; };
 		#include "vec2_swizzles.inl"
 	};
 
@@ -193,6 +194,7 @@ struct vec2
 struct vec3
 {
 	vec3() = default;
+	vec3(f32 all) : x(all), y(all), z(all) {}
 	vec3(f32 x, f32 y, f32 z) : x(x), y(y), z(z) {}
 
 	union
@@ -208,6 +210,7 @@ struct vec3
 struct vec4
 {
 	vec4() = default;
+	vec4(f32 all) : x(all), y(all), z(all), w(all) {}
 	vec4(f32 x, f32 y, f32 z, f32 w) : x(x), y(y), z(z), w(w) {}
 
 	union

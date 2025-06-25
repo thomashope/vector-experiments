@@ -91,6 +91,36 @@ TEST_CASE( "Vector swizzles" )
 	CHECK(d.xyz == a + 1);
 }
 
+// https://github.com/polymonster/maths
+TEST_CASE("Polymonster examples")
+{
+	vec4 v(1, 2, 3, 4);
+
+    vec4 swizz = v.wzyx;        // construct from swizzle
+    CHECK(swizz == vec4(4, 3, 2, 1));
+
+    swizz = v.xxxx;             // assign from swizzle
+    CHECK(swizz == vec4(1));
+
+    swizz.wyxz = v.xxyy;        // assign swizzle to swizzle
+    CHECK(swizz == vec4(2, 1, 2, 1));
+
+    vec2 v2 = swizz.yz;         // construct truncated
+    CHECK(v2 == vec2(1, 2));
+
+    swizz.wx = v.xy;            // assign truncated
+    CHECK(swizz.w == v.x);
+    CHECK(swizz.x == v.y);
+
+    swizz = vec4(1, 2, 3, 4);
+    vec4 swizz2(2, 2, 2, 2);
+    swizz.xyz *= swizz2.www;    // arithmetic on swizzles
+    CHECK(swizz.xyz == vec3(2, 4, 6));
+
+    v2 = swizz.xy * 2.0f;  		// swizzle / scalar arithmetic
+    CHECK(v2 == vec2(4, 8));
+}
+
 TEST_CASE("non-assignment operators on swizzles")
 {
 	vec3 a = vec3(3,2,1);
