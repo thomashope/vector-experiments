@@ -187,6 +187,12 @@ struct vec2
 		#include "vec2_swizzles.inl"
 	};
 
+    f32 lengthSquared() const { return x * x + y * y; }
+    f32 length() const { return std::sqrt(lengthSquared()); }
+    vec2 normalized() const { return *this / length(); }
+    vec2 trimmed(f32 length) const { return lengthSquared() > length * length ? normalized() * length : *this; }
+    vec2 withLength(f32 length) const { return normalized() * length; }
+
 	bool operator == (const vec2& rhs) const { return x == rhs.x && y == rhs.y; }
 	vec2 operator - () const { return {-x, -y}; }
 	vec_inline_ops(2)
@@ -203,6 +209,13 @@ struct vec3
 		struct { f32 x, y, z; };
 		#include "vec3_swizzles.inl"
 	};
+
+    f32 lengthSquared() const { return x * x + y * y + z * z; }
+    f32 length() const { return std::sqrt(lengthSquared()); }
+    vec3 normalized() const { return *this / length(); }
+    vec3 trimmed(f32 length) const { return lengthSquared() > length * length ? normalized() * length : *this; }
+    vec3 withLength(f32 length) const { return normalized() * length; }
+
 	bool operator == (const vec3& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
 	vec3 operator - () const { return {-x, -y, -z}; }
 	vec_inline_ops(3)
@@ -219,6 +232,13 @@ struct vec4
 		struct { f32 x, y, z, w; };
 		#include "vec4_swizzles.inl"
 	};
+
+    f32 lengthSquared() const { return x * x + y * y + z * z + w * w; }
+    f32 length() const { return std::sqrt(lengthSquared()); }
+    vec4 normalized() const { return *this / length(); }
+    vec4 trimmed(f32 length) const { return lengthSquared() > length * length ? normalized() * length : *this; }
+    vec4 withLength(f32 length) const { return normalized() * length; }
+
 	bool operator == (const vec4& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
 	vec4 operator - () const { return {-x, -y, -z, -w}; }
 	vec_inline_ops(4)
