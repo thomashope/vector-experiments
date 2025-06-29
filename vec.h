@@ -231,11 +231,11 @@ vec_free_ops(4)
 //
 //
 
-inline
-f32 dot(const vec2& a, const vec2& b)
-{
-    return a.x * b.x + a.y * b.y;
-}
+inline f32 dot(const vec2& a, const vec2& b) { return a.x * b.x + a.y * b.y; }
+
+inline vec2 abs(const vec2& v) { return { std::abs(v.x), std::abs(v.y) }; }
+inline vec3 abs(const vec3& v) { return { std::abs(v.x), std::abs(v.y), std::abs(v.z) }; }
+inline vec4 abs(const vec4& v) { return { std::abs(v.x), std::abs(v.y), std::abs(v.z), std::abs(v.w) }; }
 
 static_assert(sizeof(f32) == 4, "f32 must be 4 bytes");
 static_assert(sizeof(vec2) == 2 * sizeof(f32), "vec2 must by 2 f32");

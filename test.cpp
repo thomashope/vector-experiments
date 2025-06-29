@@ -182,6 +182,28 @@ TEST_CASE("Assign between swizzles and splats")
 	CHECK(a.zyx == b);
 
 	//a.zz = b.xy; // This shuold NOT compile
+	a.zz = b.zz; // Odd, but harmless?
+
+	vec2 c(1, 2);
+
+	// self assign swizzle
+	c.xy = c.xy;
+	CHECK(c == vec2(1, 2));
+	c.yx = c.yx;
+	CHECK(c == vec2(1, 2));
+
+	// do ops with self
+	c.xy = c.yx;
+	CHECK(c == vec2(2, 1));
+	c.yx = c.xy;
+	CHECK(c == vec2(1, 2));
+	c.yx = c.xy;
+	CHECK(c == vec2(2, 1));
+	c += 1;
+	c.xy = c.yx;
+	CHECK(c == vec2(2, 3));
+	c.yx *= c.xy;
+	CHECK(c == vec2(6, 6));
 }
 
 TEST_CASE("Vector Vector and Vector Scalar")

@@ -15,6 +15,7 @@ Swizzles can give nice ergonomics, but often come with drawbacks. This is an exp
 TODO:
 - [ ] implement enough stuff in the macro version so I can do a fair comparison
 	- all ops for vec2, 3, and 4
+	
 - [ ] bring in a comparable template based implementation to test against
 	- features. Is any differences in what the implementations are capable of?
 	- compiler compatability / what level of C++ features is required
