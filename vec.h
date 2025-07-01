@@ -131,9 +131,14 @@ typedef float f32;
 // vector splats
 //
 
+#define splat_inline_op(num, op)\
+	vec##num operator op (const vec##num& rhs) const { return vec##num(*this) op rhs; }
+
 #define splat_inline_ops(num)\
 	bool operator == (const vec##num& rhs) const { return vec##num(*this) == rhs; }\
-	vec##num operator + (const vec##num& rhs) const { return vec##num(*this) + rhs; }
+	bool operator != (const vec##num& rhs) const { return vec##num(*this) != rhs; }\
+	vec##num operator - () const { return -vec##num(*this); }\
+	splat_inline_op(num, +) splat_inline_op(num, -) splat_inline_op(num, *) splat_inline_op(num, /)
 
 // NB: splats are not assignable, but AFAIK that doesn't make sense anyway?
 #define splat_v2_v2(a, b)\

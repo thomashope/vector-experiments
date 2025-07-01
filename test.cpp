@@ -206,6 +206,26 @@ TEST_CASE("Assign between swizzles and splats")
 	CHECK(c == vec2(6, 6));
 }
 
+TEST_CASE("Splat arithmetic")
+{
+	vec3 a(1, 2, 3);
+	vec3 b(4, 5, 6);
+
+	vec3 c = a.xxx + b;
+	CHECK(c == vec3(5, 6, 7));
+
+	c = a + b.yyy;
+	CHECK(c == vec3(6, 7, 8));
+
+	c = a.xxx + b.yyy;
+	CHECK(c == vec3(6, 6, 6));
+	CHECK(c.xxx == c.yyy);
+	CHECK(c.xxx != a.xxx);
+
+	c = -a.xxx;
+	CHECK(c == vec3(-1, -1, -1));
+}
+
 TEST_CASE("Vector Vector and Vector Scalar")
 {	
 	vec3 a(1, 2, 3);
