@@ -17,30 +17,30 @@ typedef float f32;
 // SCALAR + SWIZZLE
 
 #define vec2_inline_op(op)\
-    vec<Type,2> operator op (const vec<Type,2>& rhs) const { return {x op rhs.x, y op rhs.y}; }\
-    vec<Type,2> operator op (Type s) const { return {x op s, y op s}; }\
-    vec<Type,2>& operator op##= (const vec<Type,2>& rhs) { x op##= rhs.x; y op##= rhs.y; return *this; }\
-    vec<Type,2>& operator op##= (Type s) { x op##= s; y op##= s; return *this; }
+    vec operator op (const vec& rhs) const { return vec(x op rhs.x, y op rhs.y); }\
+    vec operator op (Type s) const { return vec(x op s, y op s); }\
+    vec& operator op##= (const vec& rhs) { x op##= rhs.x; y op##= rhs.y; return *this; }\
+    vec& operator op##= (Type s) { x op##= s; y op##= s; return *this; }
 
 #define vec3_inline_op(op)\
-    vec<Type,3> operator op (const vec<Type,3>& rhs) const { return {x op rhs.x, y op rhs.y, z op rhs.z}; }\
-    vec<Type,3> operator op (Type s) const { return {x op s, y op s, z op s}; }\
-    vec<Type,3>& operator op##= (const vec<Type,3>& rhs) { x op##= rhs.x; y op##= rhs.y; z op##= rhs.z; return *this; }\
-    vec<Type,3>& operator op##= (Type s) { x op##= s; y op##= s; z op##= s; return *this; }
+    vec operator op (const vec& rhs) const { return vec(x op rhs.x, y op rhs.y, z op rhs.z); }\
+    vec operator op (Type s) const { return vec(x op s, y op s, z op s); }\
+    vec& operator op##= (const vec& rhs) { x op##= rhs.x; y op##= rhs.y; z op##= rhs.z; return *this; }\
+    vec& operator op##= (Type s) { x op##= s; y op##= s; z op##= s; return *this; }
 
 #define vec4_inline_op(op)\
-    vec<Type,4> operator op (const vec<Type,4>& rhs) const { return {x op rhs.x, y op rhs.y, z op rhs.z, w op rhs.w}; }\
-    vec<Type,4> operator op (Type s) const { return {x op s, y op s, z op s, w op s}; }\
-    vec<Type,4>& operator op##= (const vec<Type,4>& rhs) { x op##= rhs.x; y op##= rhs.y; z op##= rhs.z; w op##= rhs.w; return *this; }\
-    vec<Type,4>& operator op##= (Type s) { x op##= s; y op##= s; z op##= s; w op##= s; return *this; }
+    vec operator op (const vec& rhs) const { return vec(x op rhs.x, y op rhs.y, z op rhs.z, w op rhs.w); }\
+    vec operator op (Type s) const { return vec(x op s, y op s, z op s, w op s); }\
+    vec& operator op##= (const vec& rhs) { x op##= rhs.x; y op##= rhs.y; z op##= rhs.z; w op##= rhs.w; return *this; }\
+    vec& operator op##= (Type s) { x op##= s; y op##= s; z op##= s; w op##= s; return *this; }
 
 // Convert VEC + SWIZZLE -> VEC + VEC
 #define vec_to_swizzle_inline_op(op, num)\
-    template<VecOrSwizzle<Type, num> VecType>\
-    vec<Type,num> operator op (const VecType& rhs) const { return *this op (vec<Type,num>)rhs; }\
+    template<VecOrSwizzle<Type, num> RhsType>\
+    vec operator op (const RhsType& rhs) const { return *this op vec(rhs); }\
 
 #define vec_inline_ops(num)\
-    bool operator != (const vec##num& rhs) const { return !(*this == rhs); }\
+    bool operator != (const vec& rhs) const { return !(*this == rhs); }\
     Type* data() { return &x; }\
     const Type* data() const { return &x; }\
     f32& operator [] (int i) { return (&x)[i]; }\
@@ -125,17 +125,17 @@ typedef float f32;
 //
 
 #define splat_to_v2(a, b)\
-    operator vec<Type, 2> () const { return { a, b }; }\
+    operator vec<Type,2> () const { return { a, b }; }\
     vec<Type,2> operator - () { return -vec<Type,2>(*this); }\
     swizzle_inline_ops(2)
 
 #define splat_to_v3(a, b, c)\
-    operator vec<Type, 3> () const { return { a, b, c }; }\
+    operator vec<Type,3> () const { return { a, b, c }; }\
     vec<Type,3> operator - () { return -vec<Type,3>(*this); }\
     swizzle_inline_ops(3)
 
 #define splat_to_v4(a, b, c, d)\
-    operator vec<Type, 4> () const { return { a, b, c, d }; }\
+    operator vec<Type,4> () const { return { a, b, c, d }; }\
     vec<Type,4> operator - () { return -vec<Type,4>(*this); }\
     swizzle_inline_ops(4)
 
