@@ -36,7 +36,7 @@ typedef float f32;
 
 // Convert VEC + SWIZZLE -> VEC + VEC
 #define vec_to_swizzle_inline_op(op, num)\
-    template<ConvertibleToVec<Type, num> VecType>\
+    template<VecOrSwizzle<Type, num> VecType>\
     vec<Type,num> operator op (const VecType& rhs) const { return *this op (vec<Type,num>)rhs; }\
 
 #define vec_inline_ops(num)\
@@ -54,14 +54,14 @@ typedef float f32;
 
 #define swizzle_inline_op(num, op)\
     /* Convert SWIZZLE + SWIZZLE -> VEC + VEC */\
-    template<ConvertibleToVec<Type, num> RhsType>\
+    template<VecOrSwizzle<Type, num> RhsType>\
     vec<Type,num> operator op (const RhsType& rhs) const { return vec<Type,num>(*this) op vec<Type,num>(rhs); }\
     /* Accept SWIZZLE + SCALAR, for any SCALAR convertible to Type */\
     template<ConvertibleToScalar<Type> RhsType>\
     vec<Type,num> operator op (const RhsType& rhs) const { return vec<Type,num>(*this) op rhs; }
 
 #define swizzle_inline_ops(num)\
-    template<ConvertibleToVec<Type, num> RhsType>\
+    template<VecOrSwizzle<Type, num> RhsType>\
     bool operator == (const RhsType& rhs) const { return vec<Type,num>(*this) == rhs; }\
     swizzle_inline_op(num, +) swizzle_inline_op(num, -) swizzle_inline_op(num, *) swizzle_inline_op(num, /)
 
@@ -125,13 +125,19 @@ typedef float f32;
 //
 
 #define splat_to_v2(a, b)\
-    operator vec<Type, 2> () const { return { a, b }; }
+    operator vec<Type, 2> () const { return { a, b }; }\
+    vec<Type,2> operator - () { return -vec<Type,2>(*this); }\
+    swizzle_inline_ops(2)
 
 #define splat_to_v3(a, b, c)\
-    operator vec<Type, 3> () const { return { a, b, c }; }
+    operator vec<Type, 3> () const { return { a, b, c }; }\
+    vec<Type,3> operator - () { return -vec<Type,3>(*this); }\
+    swizzle_inline_ops(3)
 
 #define splat_to_v4(a, b, c, d)\
-    operator vec<Type, 4> () const { return { a, b, c, d }; }
+    operator vec<Type, 4> () const { return { a, b, c, d }; }\
+    vec<Type,4> operator - () { return -vec<Type,4>(*this); }\
+    swizzle_inline_ops(4)
 
 // NB: splats are not assignable, but AFAIK that doesn't make sense anyway?
 #define splat_v2_v2(a, b) struct { Type x, y; splat_to_v2(a, b) } a##b;
@@ -168,7 +174,7 @@ typedef vec<f32, 2> vec2;
 typedef vec<f32, 3> vec3;
 typedef vec<f32, 4> vec4;
 
-template<typename T, typename Type, int Size> concept ConvertibleToVec = std::convertible_to<T, vec<Type,Size>>;
+template<typename T, typename Type, int Size> concept VecOrSwizzle = std::convertible_to<T, vec<Type,Size>>;
 template<typename T, typename ScalarType> concept ConvertibleToScalar = std::convertible_to<T, ScalarType>;
 
 //
@@ -203,7 +209,7 @@ struct vec<Type, 2>
     vec_inline_ops(2)
 
     bool operator == (const vec& rhs) const { return x == rhs.x && y == rhs.y; }
-    vec operator - () const { return { Type(-x), Type(-y) }; }
+    vec operator - () const { return { -x, -y }; }
 };
 
 //
@@ -270,16 +276,24 @@ bool operator != (const vec<Type, Size>& a, const vec<Type, Size>& b)
     return !(a == b);
 }
 
-#define VEC_OP(op) \
-    template<typename Type, int Size, typename LhsType, ConvertibleToVec<Type,Size> RhsType>\
-    vec<Type,Size> operator op (const LhsType& scalar, const RhsType& vec) { return vec op scalar; }
+#define SCALAR_VEC_OP(op, type, num)\
+template<ConvertibleToScalar<type> LhsType, VecOrSwizzle<type, num> RhsType>\
+vec<type, num> operator op (const LhsType& scalar, const RhsType& vec) { return ::vec<type, num>(scalar) op vec; }
 
-VEC_OP(+)
-VEC_OP(-)
-VEC_OP(*)
-VEC_OP(/)
-#undef VEC_OP
+SCALAR_VEC_OP(+, f32, 2)
+SCALAR_VEC_OP(-, f32, 2)
+SCALAR_VEC_OP(*, f32, 2)
+SCALAR_VEC_OP(/, f32, 2)
+SCALAR_VEC_OP(+, f32, 3)
+SCALAR_VEC_OP(-, f32, 3)
+SCALAR_VEC_OP(*, f32, 3)
+SCALAR_VEC_OP(/, f32, 3)
+SCALAR_VEC_OP(+, f32, 4)
+SCALAR_VEC_OP(-, f32, 4)
+SCALAR_VEC_OP(*, f32, 4)
+SCALAR_VEC_OP(/, f32, 4)
 
+#undef SCALAR_VEC_OP
 
 /// Returns an angle between 0 and PI in radians. Both a and b must be normalized.
 ///
@@ -292,20 +306,6 @@ f32 angleBetween(const vec3& a, const vec3& b);
 inline f32 dot(const vec2& a, const vec2& b) { return a.x * b.x + a.y * b.y; }
 inline f32 dot(const vec3& a, const vec3& b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
 inline f32 dot(const vec4& a, const vec4& b) { return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w; }
-
-#if 0
-
-// dot() overloads for swizzles
-template<ConvertibleToVec2 T1, ConvertibleToVec2 T2>
-f32 dot(const T1& a, const T2& b) { return dot(vec2(a), vec2(b)); }
-
-template<ConvertibleToVec3 T1, ConvertibleToVec3 T2>
-f32 dot(const T1& a, const T2& b) { return dot(vec3(a), vec3(b)); }
-
-template<ConvertibleToVec4 T1, ConvertibleToVec4 T2>
-f32 dot(const T1& a, const T2& b) { return dot(vec4(a), vec4(b)); }
-
-#endif
 
 /// In 2D `cross` returns the signed area of the parallelogram created by the two vectors.
 inline f32 cross(const vec2& a, const vec2& b) { return a.x * b.y - a.y * b.x; }

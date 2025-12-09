@@ -242,11 +242,14 @@ TEST_CASE("Vector Vector and Vector Scalar")
 	CHECK(a * 2 == vec3(2, 4, 6));
 	CHECK(1 + a == vec3(2, 3, 4));
 	CHECK(2 * a == vec3(2, 4, 6));
+	CHECK((2 * a) / 2 == vec3(1, 2, 3));
 
 	a += 1;
 	CHECK(a == vec3(2, 3, 4));
 	a *= 2;
 	CHECK(a == vec3(4, 6, 8));
+	a /= 2;
+	CHECK(a == vec3(2, 3, 4));
 }
 
 TEST_CASE("non-assignment operators on splats")
