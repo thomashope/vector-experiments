@@ -5,3 +5,4 @@ main
 test
 main_templates
 test_templates
+*.dSYM/
