@@ -85,47 +85,27 @@ typedef float f32;
 	swizzle_v4_inline_assign_op(a, b, c, d, *)\
 	swizzle_v4_inline_assign_op(a, b, c, d, /)
 
-#define swizzle_v2_v2(a, b)\
-	struct { f32 x, y;\
+#define swizzle_to_v2(a, b)\
 	operator vec2 () const { return vec2(a, b); }\
 	swizzle_v2_inline_assign_ops(a, b)\
 	swizzle_inline_ops(2)\
-	} a##b;
 
-#define swizzle_v3_v2(a, b)\
-	struct { f32 x, y, z;\
-	operator vec2 () const { return vec2(a, b); }\
-	swizzle_v2_inline_assign_ops(a, b)\
-	swizzle_inline_ops(2)\
-	} a##b;
-
-#define swizzle_v3_v3(a, b, c)\
-	struct { f32 x, y, z;\
+#define swizzle_to_v3(a, b, c)\
 	operator vec3 () const { return vec3(a, b, c); }\
 	swizzle_v3_inline_assign_ops(a, b, c)\
 	swizzle_inline_ops(3)\
-	} a##b##c;
 
-#define swizzle_v4_v2(a, b)\
-	struct { f32 x, y, z, w;\
-	operator vec2 () const { return vec2(a, b); }\
-	swizzle_v2_inline_assign_ops(a, b)\
-	swizzle_inline_ops(2)\
-	} a##b;
-
-#define swizzle_v4_v3(a, b, c)\
-	struct { f32 x, y, z, w;\
-	operator vec3 () const { return vec3(a, b, c); }\
-	swizzle_v3_inline_assign_ops(a, b, c)\
-	swizzle_inline_ops(3)\
-	} a##b##c;
-
-#define swizzle_v4_v4(a, b, c, d)\
-	struct { f32 x, y, z, w;\
+#define swizzle_to_v4(a, b, c, d)\
 	operator vec4 () const { return vec4(a, b, c, d); }\
 	swizzle_v4_inline_assign_ops(a, b, c, d)\
 	swizzle_inline_ops(4)\
-	} a##b##c##d;
+
+#define swizzle_v2_v2(a, b) struct { f32 x, y; swizzle_to_v2(a, b) } a##b;
+#define swizzle_v3_v2(a, b) struct { f32 x, y, z; swizzle_to_v2(a, b) } a##b;
+#define swizzle_v3_v3(a, b, c) struct { f32 x, y, z; swizzle_to_v3(a, b, c)	} a##b##c;
+#define swizzle_v4_v2(a, b) struct { f32 x, y, z, w; swizzle_to_v2(a, b) } a##b;
+#define swizzle_v4_v3(a, b, c) struct { f32 x, y, z, w; swizzle_to_v3(a, b, c) } a##b##c;
+#define swizzle_v4_v4(a, b, c, d) struct { f32 x, y, z, w; swizzle_to_v4(a, b, c, d) } a##b##c##d;
 
 //
 // vector splats
@@ -140,42 +120,25 @@ typedef float f32;
 	vec##num operator - () const { return -vec##num(*this); }\
 	splat_inline_op(num, +) splat_inline_op(num, -) splat_inline_op(num, *) splat_inline_op(num, /)
 
-// NB: splats are not assignable, but AFAIK that doesn't make sense anyway?
-#define splat_v2_v2(a, b)\
-	struct { f32 x, y;\
+#define splat_to_v2(a, b)\
 	operator vec2 () const { return vec2(a, b); }\
 	splat_inline_ops(2)\
-	} a##b;
 
-#define splat_v3_v2(a, b)\
-	struct { f32 x, y, z;\
-	operator vec2 () const { return vec2(a, b); }\
-	splat_inline_ops(2)\
-	} a##b;
-
-#define splat_v3_v3(a, b, c)\
-	struct { f32 x, y, z;\
+#define splat_to_v3(a, b, c)\
 	operator vec3 () const { return vec3(a, b, c); }\
 	splat_inline_ops(3)\
-	} a##b##c;
 
-#define splat_v4_v2(a, b)\
-	struct { f32 x, y, z, w;\
-	operator vec2 () const { return vec2(a, b); }\
-	splat_inline_ops(2)\
-	} a##b;
-
-#define splat_v4_v3(a, b, c)\
-	struct { f32 x, y, z, w;\
-	operator vec3 () const { return vec3(a, b, c); }\
-	splat_inline_ops(3)\
-	} a##b##c;
-
-#define splat_v4_v4(a, b, c, d)\
-	struct { f32 x, y, z, w;\
+#define splat_to_v4(a, b, c, d)\
 	operator vec4 () const { return vec4(a, b, c, d); }\
 	splat_inline_ops(4)\
-	} a##b##c##d;
+
+// NB: splats are not assignable, but AFAIK that doesn't make sense anyway?
+#define splat_v2_v2(a, b) struct { f32 x, y; splat_to_v2(a, b) } a##b;
+#define splat_v3_v2(a, b) struct { f32 x, y, z; splat_to_v2(a, b) } a##b;
+#define splat_v3_v3(a, b, c) struct { f32 x, y, z; splat_to_v3(a, b, c) } a##b##c;
+#define splat_v4_v2(a, b) struct { f32 x, y, z, w; splat_to_v2(a, b) } a##b;
+#define splat_v4_v3(a, b, c) struct { f32 x, y, z, w; splat_to_v3(a, b, c) } a##b##c;
+#define splat_v4_v4(a, b, c, d) struct { f32 x, y, z, w; splat_to_v4(a, b, c, d) } a##b##c##d;
 
 //
 // vector types
