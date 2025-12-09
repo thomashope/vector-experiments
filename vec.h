@@ -46,7 +46,7 @@ typedef float f32;
 
 #define swizzle_inline_op(num, op)\
 	vec##num operator op (const vec##num& rhs) const { return vec##num(*this) op rhs; }\
-	vec##num operator op (const f32& rhs) { return vec##num(*this) op rhs; }
+	vec##num operator op (const f32& rhs) const { return vec##num(*this) op rhs; }
 
 #define swizzle_inline_ops(num)\
 	bool operator == (const vec##num& rhs) const { return vec##num(*this) == rhs; }\
