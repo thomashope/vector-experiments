@@ -1,4 +1,4 @@
-#include "vec.h"
+#include "vec_templates.h"
 
 int main()
 {

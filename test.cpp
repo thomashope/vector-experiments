@@ -1,7 +1,11 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
 
+#ifdef VEC_TEMPLATES
+#include "vec_templates.h"
+#else
 #include "vec.h"
+#endif
 
 void print(vec3 v) { printf("%.3f, %.3f, %.3f\n", v.x, v.y, v.z); }
 void print(vec2 v) { printf("%.3f, %.3f\n", v.x, v.y); }

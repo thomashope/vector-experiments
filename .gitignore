@@ -1,3 +1,7 @@
 a.out
 .DS_Store
 *.inl
+main
+test
+main_templates
+test_templates
