@@ -7,6 +7,7 @@
 #include "vec.h"
 #endif
 
+void print(vec4 v) { printf("%.3f, %.3f, %.3f %.3f\n", v.x, v.y, v.z, v.w); }
 void print(vec3 v) { printf("%.3f, %.3f, %.3f\n", v.x, v.y, v.z); }
 void print(vec2 v) { printf("%.3f, %.3f\n", v.x, v.y); }
 
@@ -77,7 +78,7 @@ TEST_CASE( "Vector swizzles" )
 	//modify_ref(a.xy); // FIXME? compile error, better than silent failure...
 
 	a = vec3(1,1,1);
-	print_ref(a.xy);
+	// print_ref(a.xy);
 	a.xz += vec2(1,1);
 	CHECK(a == vec3(2,1,2));
 
@@ -156,6 +157,9 @@ TEST_CASE("non-assignment operators on swizzles")
 
 	CHECK(1 + a.xy == xy + 1);
 	CHECK(a.xy + 1 == xy + 1);
+	xy += 1;
+	CHECK(1 + a.xy == xy);
+	CHECK(a.xy + 1 == xy);
 }
 
 TEST_CASE("Assign between swizzles and vectors")

@@ -14,5 +14,5 @@ test: test.cpp
 	./test
 
 test_templates: test.cpp
-	$(CXX) test.cpp $(CXXFLAGS) -DVEC_TEMPLATES -o test_templates
+	$(CXX) test.cpp $(CXXFLAGS) -std=c++20 -DVEC_TEMPLATES -o test_templates
 	./test_templates
