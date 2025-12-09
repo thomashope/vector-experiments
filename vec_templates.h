@@ -16,61 +16,29 @@ typedef float f32;
 // vector swizzles
 //
 
-#define swizzle_inline_op(num, op)\
-    vec<Type, num> operator op (const vec<Type, num>& rhs) const { return vec<Type, num>(*this) op rhs; }\
-    vec<Type, num> operator op (const Type& rhs) const { return vec<Type, num>(*this) op rhs; }
-
-#define swizzle_inline_ops(num)\
-    bool operator == (const vec<Type, num>& rhs) const { return vec<Type, num>(*this) == rhs; }\
-    swizzle_inline_op(num, +) swizzle_inline_op(num, -) swizzle_inline_op(num, *) swizzle_inline_op(num, /)
-
-// NB: returning void here breaks chaining, but IDK if I ever use that?
-#define swizzle_v2_inline_assign_op(a, b, op)\
-    void operator op##= (const vec<Type, 2>& rhs) { a op##= rhs.x; b op##= rhs.y; }
-
-#define swizzle_v2_inline_assign_ops(a, b)\
-    void operator = (const vec<Type, 2>& rhs) { a = rhs.x; b = rhs.y; }\
-    swizzle_v2_inline_assign_op(a, b, +)\
-    swizzle_v2_inline_assign_op(a, b, -)\
-    swizzle_v2_inline_assign_op(a, b, *)\
-    swizzle_v2_inline_assign_op(a, b, /)
-
-// NB: returning void here breaks chaining, but IDK if I ever use that?
-#define swizzle_v3_inline_assign_op(a, b, c, op)\
-    void operator op##= (const vec<Type, 3>& rhs) { a op##= rhs.x; b op##= rhs.y; c op##= rhs.z; }
-
-#define swizzle_v3_inline_assign_ops(a, b, c)\
-    void operator = (const vec<Type, 3>& rhs) { a = rhs.x; b = rhs.y; c = rhs.z; }\
-    swizzle_v3_inline_assign_op(a, b, c, +)\
-    swizzle_v3_inline_assign_op(a, b, c, -)\
-    swizzle_v3_inline_assign_op(a, b, c, *)\
-    swizzle_v3_inline_assign_op(a, b, c, /)
-
-// NB: returning void here breaks chaining, but IDK if I ever use that?
-#define swizzle_v4_inline_assign_op(a, b, c, d, op)\
-    void operator op##= (const vec<Type, 4>& rhs) { a op##= rhs.x; b op##= rhs.y; c op##= rhs.z; d op##= rhs.w; }
-
-#define swizzle_v4_inline_assign_ops(a, b, c, d)\
-    void operator = (const vec<Type, 4>& rhs) { a = rhs.x; b = rhs.y; c = rhs.z; d = rhs.w; }\
-    swizzle_v4_inline_assign_op(a, b, c, d, +)\
-    swizzle_v4_inline_assign_op(a, b, c, d, -)\
-    swizzle_v4_inline_assign_op(a, b, c, d, *)\
-    swizzle_v4_inline_assign_op(a, b, c, d, /)
-
 #define swizzle_to_v2(a, b)\
     operator vec<Type, 2> () const { return {a, b}; }\
-    swizzle_v2_inline_assign_ops(a, b)\
-    swizzle_inline_ops(2)
+    void operator = (const vec<Type, 2>& rhs) { a = rhs.x; b = rhs.y; }\
+    void operator += (const vec<Type, 2>& rhs) { a += rhs.x; b += rhs.y; }\
+    void operator -= (const vec<Type, 2>& rhs) { a -= rhs.x; b -= rhs.y; }\
+    void operator *= (const vec<Type, 2>& rhs) { a *= rhs.x; b *= rhs.y; }\
+    void operator /= (const vec<Type, 2>& rhs) { a /= rhs.x; b /= rhs.y; }
 
 #define swizzle_to_v3(a, b, c)\
     operator vec<Type, 3> () const { return {a, b, c}; }\
-    swizzle_v3_inline_assign_ops(a, b, c)\
-    swizzle_inline_ops(3)
+    void operator = (const vec<Type, 3>& rhs) { a = rhs.x; b = rhs.y; c = rhs.z; }\
+    void operator += (const vec<Type, 3>& rhs) { a += rhs.x; b += rhs.y; c += rhs.z; }\
+    void operator -= (const vec<Type, 3>& rhs) { a -= rhs.x; b -= rhs.y; c -= rhs.z; }\
+    void operator *= (const vec<Type, 3>& rhs) { a *= rhs.x; b *= rhs.y; c *= rhs.z; }\
+    void operator /= (const vec<Type, 3>& rhs) { a /= rhs.x; b /= rhs.y; c /= rhs.z; }
 
 #define swizzle_to_v4(a, b, c, d)\
     operator vec<Type, 4> () const { return {a, b, c, d}; }\
-    swizzle_v4_inline_assign_ops(a, b, c, d)\
-    swizzle_inline_ops(4)
+    void operator = (const vec<Type, 4>& rhs) { a = rhs.x; b = rhs.y; c = rhs.z; d = rhs.w; }\
+    void operator += (const vec<Type, 4>& rhs) { a += rhs.x; b += rhs.y; c += rhs.z; d += rhs.w; }\
+    void operator -= (const vec<Type, 4>& rhs) { a -= rhs.x; b -= rhs.y; c -= rhs.z; d -= rhs.w; }\
+    void operator *= (const vec<Type, 4>& rhs) { a *= rhs.x; b *= rhs.y; c *= rhs.z; d *= rhs.w; }\
+    void operator /= (const vec<Type, 4>& rhs) { a /= rhs.x; b /= rhs.y; c /= rhs.z; d /= rhs.w; }
 
 #define swizzle_v2_v2(a, b) struct { Type x, y; swizzle_to_v2(a, b) } a##b;
 #define swizzle_v3_v2(a, b) struct { Type x, y, z; swizzle_to_v2(a, b) } a##b;
@@ -83,26 +51,14 @@ typedef float f32;
 // vector splats
 //
 
-#define splat_inline_op(num, op)
-    // vec##num operator op (const vec##num& rhs) const { return vec##num(*this) op rhs; }
-
-#define splat_inline_ops(num)
-    // bool operator == (const vec##num& rhs) const { return vec##num(*this) == rhs; }
-    // bool operator != (const vec##num& rhs) const { return vec##num(*this) != rhs; }
-    // vec##num operator - () const { return -vec##num(*this); }
-    // splat_inline_op(num, +) splat_inline_op(num, -) splat_inline_op(num, *) splat_inline_op(num, /)
-
 #define splat_to_v2(a, b)\
-    operator vec2 () const { return vec2(a, b); }\
-    splat_inline_ops(2)\
+    operator vec2 () const { return vec2(a, b); }
 
 #define splat_to_v3(a, b, c)\
-    operator vec3 () const { return vec3(a, b, c); }\
-    splat_inline_ops(3)\
+    operator vec3 () const { return vec3(a, b, c); }
 
 #define splat_to_v4(a, b, c, d)\
-    operator vec4 () const { return vec4(a, b, c, d); }\
-    splat_inline_ops(4)\
+    operator vec4 () const { return vec4(a, b, c, d); }
 
 // NB: splats are not assignable, but AFAIK that doesn't make sense anyway?
 #define splat_v2_v2(a, b) struct { f32 x, y; splat_to_v2(a, b) } a##b;
@@ -235,58 +191,262 @@ bool operator != (const vec<Type, Size>& a, const vec<Type, Size>& b)
     return !(a == b);
 }
 
-// vec + vec
-#define op(o) template<typename Type, int Size> vec<Type, Size> operator o (const vec<Type, Size>& a, const vec<Type, Size>& b) { vec<Type, Size> result; for (int i = 0; i < Size; ++i) result[i] = a[i] o b[i]; return result; }
-    op(+)
-    op(-)
-    op(*)
-    op(/)
-#undef op
+//
+// C++20 Concepts for type-safe vector operations
+//
 
-// vec + convertible_to_vec (for swizzles on RHS)
-// The typename = ... part ensures this doesn't match when Swizzle is vec<Type, Size> (avoiding infinite recursion)
-#define op(o) template<typename Type, int Size, typename Swizzle, \
-    typename = typename std::enable_if<!std::is_same<Swizzle, vec<Type, Size>>::value>::type> \
-auto operator o (const vec<Type, Size>& a, const Swizzle& b) -> decltype(a o vec<Type, Size>(b)) { \
-    return a o vec<Type, Size>(b); \
+// Check if type is exactly a vec type
+template<typename T> concept IsVec2 = std::same_as<T, vec2>;
+template<typename T> concept IsVec3 = std::same_as<T, vec3>;
+template<typename T> concept IsVec4 = std::same_as<T, vec4>;
+template<typename T> concept IsVec = IsVec2<T> || IsVec3<T> || IsVec4<T>;
+
+// Check if type is convertible to vec (includes swizzles)
+template<typename T> concept ConvertibleToVec2 = std::convertible_to<T, vec2>;
+template<typename T> concept ConvertibleToVec3 = std::convertible_to<T, vec3>;
+template<typename T> concept ConvertibleToVec4 = std::convertible_to<T, vec4>;
+
+// Check if type is a scalar (for vec-scalar operations)
+template<typename T> concept Scalar = std::convertible_to<T, f32>;
+
+//
+// Binary arithmetic operators: +, -, *, /
+// These handle all combinations of vec, swizzle, and scalar
+//
+
+// vec + vec (for exact vec types)
+template<typename Type, int Size>
+vec<Type, Size> operator + (const vec<Type, Size>& a, const vec<Type, Size>& b) {
+    vec<Type, Size> result;
+    for (int i = 0; i < Size; ++i) result[i] = a[i] + b[i];
+    return result;
 }
-    op(+)
-    op(-)
-    op(*)
-    op(/)
-#undef op
 
-// vec += vec
-#define op(o) template<typename Type, int Size> vec<Type, Size>& operator o (vec<Type, Size>& a, const vec<Type, Size>& b) { for (int i = 0; i < Size; ++i) a[i] o b[i]; return a; }
-    op(+=)
-    op(-=)
-    op(*=)
-    op(/=)
-#undef op
+template<typename Type, int Size>
+vec<Type, Size> operator - (const vec<Type, Size>& a, const vec<Type, Size>& b) {
+    vec<Type, Size> result;
+    for (int i = 0; i < Size; ++i) result[i] = a[i] - b[i];
+    return result;
+}
 
-// vec + scalar
-#define op(o) template<typename Type, int Size> vec<Type, Size> operator o (const vec<Type, Size>& a, const f32 scalar) { vec<Type, Size> result; for (int i = 0; i < Size; ++i) result[i] = a[i] o scalar; return result; }
-    op(+)
-    op(-)
-    op(*)
-    op(/)
-#undef op
+template<typename Type, int Size>
+vec<Type, Size> operator * (const vec<Type, Size>& a, const vec<Type, Size>& b) {
+    vec<Type, Size> result;
+    for (int i = 0; i < Size; ++i) result[i] = a[i] * b[i];
+    return result;
+}
 
-// scalar + vec
-#define op(o) template<typename Type, int Size> vec<Type, Size> operator o (const f32 scalar, const vec<Type, Size>& a) { return a o scalar; }
-    op(+)
-    op(-)
-    op(*)
-    op(/)
-#undef op
+template<typename Type, int Size>
+vec<Type, Size> operator / (const vec<Type, Size>& a, const vec<Type, Size>& b) {
+    vec<Type, Size> result;
+    for (int i = 0; i < Size; ++i) result[i] = a[i] / b[i];
+    return result;
+}
 
-// vec += scalar
-#define op(o) template<typename Type, int Size> vec<Type, Size>& operator o (vec<Type, Size>& a, f32 scalar) { for (int i = 0; i < Size; ++i) a[i] o scalar; return a; }
-    op(+=)
-    op(-=)
-    op(*=)
-    op(/=)
-#undef op
+// vec + convertible (e.g., vec2 + swizzle) and convertible + vec (e.g., swizzle + vec2)
+#define VEC_OP(op) \
+template<ConvertibleToVec2 T1, ConvertibleToVec2 T2> requires (!IsVec2<T1> || !IsVec2<T2>) \
+vec2 operator op (const T1& a, const T2& b) { return vec2(a) op vec2(b); } \
+template<ConvertibleToVec3 T1, ConvertibleToVec3 T2> requires (!IsVec3<T1> || !IsVec3<T2>) \
+vec3 operator op (const T1& a, const T2& b) { return vec3(a) op vec3(b); } \
+template<ConvertibleToVec4 T1, ConvertibleToVec4 T2> requires (!IsVec4<T1> || !IsVec4<T2>) \
+vec4 operator op (const T1& a, const T2& b) { return vec4(a) op vec4(b); }
+
+VEC_OP(+)
+VEC_OP(-)
+VEC_OP(*)
+VEC_OP(/)
+#undef VEC_OP
+
+// vec + scalar (proper implementation)
+template<typename Type, int Size, Scalar S>
+vec<Type, Size> operator + (const vec<Type, Size>& v, const S& s) {
+    vec<Type, Size> result;
+    f32 scalar = f32(s);
+    for (int i = 0; i < Size; ++i) result[i] = v[i] + scalar;
+    return result;
+}
+
+template<typename Type, int Size, Scalar S>
+vec<Type, Size> operator - (const vec<Type, Size>& v, const S& s) {
+    vec<Type, Size> result;
+    f32 scalar = f32(s);
+    for (int i = 0; i < Size; ++i) result[i] = v[i] - scalar;
+    return result;
+}
+
+template<typename Type, int Size, Scalar S>
+vec<Type, Size> operator * (const vec<Type, Size>& v, const S& s) {
+    vec<Type, Size> result;
+    f32 scalar = f32(s);
+    for (int i = 0; i < Size; ++i) result[i] = v[i] * scalar;
+    return result;
+}
+
+template<typename Type, int Size, Scalar S>
+vec<Type, Size> operator / (const vec<Type, Size>& v, const S& s) {
+    vec<Type, Size> result;
+    f32 scalar = f32(s);
+    for (int i = 0; i < Size; ++i) result[i] = v[i] / scalar;
+    return result;
+}
+
+// scalar + vec (symmetric operations)
+template<typename Type, int Size, Scalar S>
+vec<Type, Size> operator + (const S& s, const vec<Type, Size>& v) {
+    return v + s;
+}
+
+template<typename Type, int Size, Scalar S>
+vec<Type, Size> operator - (const S& s, const vec<Type, Size>& v) {
+    vec<Type, Size> result;
+    f32 scalar = f32(s);
+    for (int i = 0; i < Size; ++i) result[i] = scalar - v[i];
+    return result;
+}
+
+template<typename Type, int Size, Scalar S>
+vec<Type, Size> operator * (const S& s, const vec<Type, Size>& v) {
+    return v * s;
+}
+
+template<typename Type, int Size, Scalar S>
+vec<Type, Size> operator / (const S& s, const vec<Type, Size>& v) {
+    vec<Type, Size> result;
+    f32 scalar = f32(s);
+    for (int i = 0; i < Size; ++i) result[i] = scalar / v[i];
+    return result;
+}
+
+//
+// Compound assignment operators: +=, -=, *=, /=
+//
+
+// vec += vec (for exact vec types)
+template<typename Type, int Size>
+vec<Type, Size>& operator += (vec<Type, Size>& a, const vec<Type, Size>& b) {
+    for (int i = 0; i < Size; ++i) a[i] += b[i];
+    return a;
+}
+
+template<typename Type, int Size>
+vec<Type, Size>& operator -= (vec<Type, Size>& a, const vec<Type, Size>& b) {
+    for (int i = 0; i < Size; ++i) a[i] -= b[i];
+    return a;
+}
+
+template<typename Type, int Size>
+vec<Type, Size>& operator *= (vec<Type, Size>& a, const vec<Type, Size>& b) {
+    for (int i = 0; i < Size; ++i) a[i] *= b[i];
+    return a;
+}
+
+template<typename Type, int Size>
+vec<Type, Size>& operator /= (vec<Type, Size>& a, const vec<Type, Size>& b) {
+    for (int i = 0; i < Size; ++i) a[i] /= b[i];
+    return a;
+}
+
+// vec += scalar (proper implementation without recursion)
+template<typename Type, int Size, Scalar S>
+vec<Type, Size>& operator += (vec<Type, Size>& a, const S& s) {
+    f32 scalar = f32(s);
+    for (int i = 0; i < Size; ++i) a[i] += scalar;
+    return a;
+}
+
+template<typename Type, int Size, Scalar S>
+vec<Type, Size>& operator -= (vec<Type, Size>& a, const S& s) {
+    f32 scalar = f32(s);
+    for (int i = 0; i < Size; ++i) a[i] -= scalar;
+    return a;
+}
+
+template<typename Type, int Size, Scalar S>
+vec<Type, Size>& operator *= (vec<Type, Size>& a, const S& s) {
+    f32 scalar = f32(s);
+    for (int i = 0; i < Size; ++i) a[i] *= scalar;
+    return a;
+}
+
+template<typename Type, int Size, Scalar S>
+vec<Type, Size>& operator /= (vec<Type, Size>& a, const S& s) {
+    f32 scalar = f32(s);
+    for (int i = 0; i < Size; ++i) a[i] /= scalar;
+    return a;
+}
+
+//
+// Comparison operators: ==, !=
+//
+
+// vec == convertible and convertible == vec (handles swizzle comparisons)
+template<ConvertibleToVec2 T1, ConvertibleToVec2 T2> requires (!IsVec2<T1> || !IsVec2<T2>)
+bool operator == (const T1& a, const T2& b) { return vec2(a) == vec2(b); }
+
+template<ConvertibleToVec3 T1, ConvertibleToVec3 T2> requires (!IsVec3<T1> || !IsVec3<T2>)
+bool operator == (const T1& a, const T2& b) { return vec3(a) == vec3(b); }
+
+template<ConvertibleToVec4 T1, ConvertibleToVec4 T2> requires (!IsVec4<T1> || !IsVec4<T2>)
+bool operator == (const T1& a, const T2& b) { return vec4(a) == vec4(b); }
+
+template<ConvertibleToVec2 T1, ConvertibleToVec2 T2>
+bool operator != (const T1& a, const T2& b) { return !(a == b); }
+
+template<ConvertibleToVec3 T1, ConvertibleToVec3 T2>
+bool operator != (const T1& a, const T2& b) { return !(a == b); }
+
+template<ConvertibleToVec4 T1, ConvertibleToVec4 T2>
+bool operator != (const T1& a, const T2& b) { return !(a == b); }
+
+//
+// Unary operators
+//
+
+template<ConvertibleToVec2 T> requires (!IsVec2<T>)
+vec2 operator - (const T& v) { return -vec2(v); }
+
+template<ConvertibleToVec3 T> requires (!IsVec3<T>)
+vec3 operator - (const T& v) { return -vec3(v); }
+
+template<ConvertibleToVec4 T> requires (!IsVec4<T>)
+vec4 operator - (const T& v) { return -vec4(v); }
+
+//
+// Additional operators for types convertible to vec (using SFINAE/decltype for swizzles)
+// These handle swizzle + scalar and scalar + swizzle where implicit conversion doesn't work through template deduction
+//
+
+#define SWIZZLE_SCALAR_OPS(VecType) \
+template<typename T, typename S> \
+requires (!std::same_as<T, VecType> && !std::same_as<S, VecType> && Scalar<S>) \
+auto operator + (const T& v, const S& s) -> decltype(VecType(v) + VecType()) { return VecType(v) + f32(s); } \
+template<typename T, typename S> \
+requires (!std::same_as<T, VecType> && !std::same_as<S, VecType> && Scalar<S>) \
+auto operator - (const T& v, const S& s) -> decltype(VecType(v) + VecType()) { return VecType(v) - f32(s); } \
+template<typename T, typename S> \
+requires (!std::same_as<T, VecType> && !std::same_as<S, VecType> && Scalar<S>) \
+auto operator * (const T& v, const S& s) -> decltype(VecType(v) + VecType()) { return VecType(v) * f32(s); } \
+template<typename T, typename S> \
+requires (!std::same_as<T, VecType> && !std::same_as<S, VecType> && Scalar<S>) \
+auto operator / (const T& v, const S& s) -> decltype(VecType(v) + VecType()) { return VecType(v) / f32(s); } \
+template<typename S, typename T> \
+requires (!std::same_as<T, VecType> && !std::same_as<S, VecType> && Scalar<S>) \
+auto operator + (const S& s, const T& v) -> decltype(VecType(v) + VecType()) { return f32(s) + VecType(v); } \
+template<typename S, typename T> \
+requires (!std::same_as<T, VecType> && !std::same_as<S, VecType> && Scalar<S>) \
+auto operator - (const S& s, const T& v) -> decltype(VecType(v) + VecType()) { return f32(s) - VecType(v); } \
+template<typename S, typename T> \
+requires (!std::same_as<T, VecType> && !std::same_as<S, VecType> && Scalar<S>) \
+auto operator * (const S& s, const T& v) -> decltype(VecType(v) + VecType()) { return f32(s) * VecType(v); } \
+template<typename S, typename T> \
+requires (!std::same_as<T, VecType> && !std::same_as<S, VecType> && Scalar<S>) \
+auto operator / (const S& s, const T& v) -> decltype(VecType(v) + VecType()) { return f32(s) / VecType(v); }
+
+SWIZZLE_SCALAR_OPS(vec2)
+SWIZZLE_SCALAR_OPS(vec3)
+SWIZZLE_SCALAR_OPS(vec4)
+#undef SWIZZLE_SCALAR_OPS
 
 /// Returns an angle between 0 and PI in radians. Both a and b must be normalized.
 ///
@@ -299,6 +459,16 @@ f32 angleBetween(const vec3& a, const vec3& b);
 inline f32 dot(const vec2& a, const vec2& b) { return a.x * b.x + a.y * b.y; }
 inline f32 dot(const vec3& a, const vec3& b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
 inline f32 dot(const vec4& a, const vec4& b) { return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w; }
+
+// dot() overloads for swizzles
+template<ConvertibleToVec2 T1, ConvertibleToVec2 T2>
+f32 dot(const T1& a, const T2& b) { return dot(vec2(a), vec2(b)); }
+
+template<ConvertibleToVec3 T1, ConvertibleToVec3 T2>
+f32 dot(const T1& a, const T2& b) { return dot(vec3(a), vec3(b)); }
+
+template<ConvertibleToVec4 T1, ConvertibleToVec4 T2>
+f32 dot(const T1& a, const T2& b) { return dot(vec4(a), vec4(b)); }
 
 /// In 2D `cross` returns the signed area of the parallelogram created by the two vectors.
 inline f32 cross(const vec2& a, const vec2& b) { return a.x * b.y - a.y * b.x; }
