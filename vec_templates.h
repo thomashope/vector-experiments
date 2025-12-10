@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <concepts>
 #include <type_traits>
 
 typedef float f32;
@@ -39,12 +40,19 @@ typedef float f32;
     template<VecOrSwizzle<Type, num> RhsType>\
     vec operator op (const RhsType& rhs) const { return *this op vec(rhs); }\
 
+#define vec_inline_funcs\
+    Type length() const { return std::sqrt(lengthSquared()); }\
+    vec normalized() const { Type l = length(); return l ? *this / l : *this; }\
+    vec trimmed(Type length) const { return lengthSquared() > length * length ? normalized() * length : *this; }\
+    vec withLength(Type length) const { return normalized() * length; }
+
 #define vec_inline_ops(num)\
     bool operator != (const vec& rhs) const { return !(*this == rhs); }\
     Type* data() { return &x; }\
     const Type* data() const { return &x; }\
     f32& operator [] (int i) { return (&x)[i]; }\
     const f32& operator [] (int i) const { return (&x)[i]; }\
+    vec_inline_funcs\
     vec_to_swizzle_inline_op(+, num) vec_to_swizzle_inline_op(-, num) vec_to_swizzle_inline_op(*, num) vec_to_swizzle_inline_op(/, num)\
     vec##num##_inline_op(+) vec##num##_inline_op(-) vec##num##_inline_op(*) vec##num##_inline_op(/)
 
@@ -100,16 +108,19 @@ typedef float f32;
 
 #define swizzle_to_v2(a, b)\
     operator vec<Type, 2> () const { return {a, b}; }\
+    Type lengthSquared() const { return vec(a * a, b * b); }\
     swizzle_inline_ops(2)\
     swizzle_v2_inline_assign_ops(a, b)
 
 #define swizzle_to_v3(a, b, c)\
     operator vec<Type, 3> () const { return {a, b, c}; }\
+    Type lengthSquared() const { return vec(a * a, b * b, c * c); }\
     swizzle_inline_ops(3)\
     swizzle_v3_inline_assign_ops(a, b, c)
 
 #define swizzle_to_v4(a, b, c, d)\
     operator vec<Type, 4> () const { return {a, b, c, d}; }\
+    Type lengthSquared() const { return vec(a * a, b * b, c * c, d * d); }\
     swizzle_inline_ops(4)\
     swizzle_v4_inline_assign_ops(a, b, c, d)
 
@@ -164,8 +175,7 @@ struct vec
         return result;
     }
 
-    Type length() const { return std::sqrt(lengthSquared()); }
-    vec normalized() const { return *this / length(); }
+    vec_inline_funcs
 
     bool operator == (const vec& rhs) { return std::memcmp(v, rhs.v, sizeof(v)) == 0; }
 };
@@ -195,21 +205,17 @@ struct vec<Type, 2>
     vec(Type x, Type y) : x(x), y(y) {}
 
     /// 0 points along the positive x axis. PI/2 points along the positive Y axis.
-    static vec fromAngle(f32 radians) { return { std::cos(radians), std::sin(radians) }; }
+    static vec withAngle(f32 radians) { return { std::cos(radians), std::sin(radians) }; }
 
-    f32 lengthSquared() const { return x * x + y * y; }
-    f32 length() const { return std::sqrt(lengthSquared()); }
-    f32 angle() const { return std::atan2(y, x); }; /// Returns the angle in radins to the positive X axis.
+    Type lengthSquared() const { return x * x + y * y; }
+    Type angle() const { return std::atan2(y, x); }; /// Returns the angle in radins to the positive X axis.
     vec rotated(f32 radians) const { f32 s = std::sin(radians), c = std::cos(radians); return { x * c - y * s, x * s + y * c }; }
-    vec normalized() const { return *this / length(); }
-    vec trimmed(f32 length) const { return lengthSquared() > length * length ? normalized() * length : *this; }
-    vec withLength(f32 length) const { return normalized() * length; }
     bool isNan() const { return std::isnan(x) || std::isnan(y); }
 
     vec_inline_ops(2)
 
     bool operator == (const vec& rhs) const { return x == rhs.x && y == rhs.y; }
-    vec operator - () const { return { -x, -y }; }
+    vec operator - () const { return vec(-x, -y); }
 };
 
 //
@@ -231,18 +237,14 @@ struct vec<Type, 3>
     vec(Type x, Type y, Type z) : x(x), y(y), z(z) {}
     vec(vec<Type, 2> xy, Type z) : x(xy.x), y(xy.y), z(z) {}
 
-    f32 lengthSquared() const { return x * x + y * y + z * z; }
-    f32 length() const { return std::sqrt(lengthSquared()); }
-    vec normalized() const { f32 l = length(); return l ? *this / l : *this; }
+    Type lengthSquared() const { return x * x + y * y + z * z; }
     vec2 pitchYaw() const { vec dir = normalized(); return { std::asin(dir.z), std::atan2(dir.y, dir.x) }; } /// Returns a vec2 where X is the pitch and Y is the yaw.
-    vec trimmed(f32 length) const { return lengthSquared() > length * length ? normalized() * length : *this; }
-    vec withLength(f32 length) const { return normalized() * length; }
     bool isNan() const { return std::isnan(x) || std::isnan(y) || std::isnan(z); }
 
     vec_inline_ops(3)
 
     bool operator == (const vec& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
-    vec operator - () const { return { -x, -y, -z }; }
+    vec operator - () const { return vec(-x, -y, -z); }
 };
 
 template<typename Type>
@@ -260,14 +262,12 @@ struct vec<Type, 4>
     vec(Type x, Type y, Type z, Type w) : x(x), y(y), z(z), w(w) {}
     vec(vec<Type, 3> xyz, Type w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) {}
 
-    f32 lengthSquared() const { return x * x + y * y + z * z + w * w; }
-    f32 length() const { return std::sqrt(lengthSquared()); }
-    vec normalized() const { f32 l = length(); return l ? *this / l : *this; }
+    Type lengthSquared() const { return x * x + y * y + z * z + w * w; }
 
     vec_inline_ops(4)
 
     bool operator == (const vec& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
-    vec operator - () const { return { -x, -y, -z, -w }; }
+    vec operator - () const { return vec(-x, -y, -z, -w); }
 };
 
 template<typename Type, int Size>
